@@ -61,3 +61,42 @@ rincome %>% select(rincome, age) %>% arrange(age)
 
 ggplot(rincome, aes(age, fct_relevel(rincome, "Not applicable"))) + geom_point()
 fct_relevel(rincome$rincome, "Not applicable")
+
+
+# 15.5.1 Exercises
+
+# 1. How have the proportions of people identifying as Democrat, Republican, and Independent changed over time?
+gss_cat$partyid2 <- fct_collapse(gss_cat$partyid,
+                         NULL = c("No answer", "Don't know", "Other party"),
+                         rep = c("Strong republican", "Not str republican"),
+                         ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+                         dem = c("Not str democrat", "Strong democrat")
+)
+
+party_count <- gss_cat %>% 
+                filter(partyid2 %in% c("rep", "ind", "dem")) %>% 
+                group_by(partyid2, year) %>% 
+                count()
+
+ggplot(party_count, aes(year, n, colour = partyid2)) +
+  geom_point() +
+  geom_line() + 
+  labs(colour = "Партия")
+
+# вариант с mutate
+ggplot(
+  gss_cat %>%
+    mutate(partyid = fct_collapse(partyid,
+                                  other = c("No answer", "Don't know", "Other party"),
+                                  rep = c("Strong republican", "Not str republican"),
+                                  ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+                                  dem = c("Not str democrat", "Strong democrat"))) %>%
+    count(partyid, year),
+  aes(year, n, colour = partyid)) +
+geom_point() +
+geom_line() + 
+labs(colour = "Партия")
+
+# 2. How could you collapse rincome into a small set of categories?
+levels(gss_cat$rincome)
+# fct_collapse или fct_relabel?
