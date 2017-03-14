@@ -36,3 +36,28 @@ gss_cat %>%
   ggplot(aes(relig)) +
     geom_bar()
 
+
+# 15.4.1 Exercises
+
+# 1. There are some suspiciously high numbers in tvhours. Is the mean a good summary?
+
+# 2. For each factor in gss_cat identify whether the order of the levels is arbitrary or principled.
+
+gss_cat %>%
+  select_if (is.factor) %>% 
+  sapply(levels)
+
+# 3. Why did moving “Not applicable” to the front of the levels move it to the bottom of the plot?
+rincome <- gss_cat %>%
+  group_by(rincome) %>%
+  summarise(
+    age = mean(age, na.rm = TRUE),
+    tvhours = mean(tvhours, na.rm = TRUE),
+    n = n()
+  )
+
+ggplot(rincome, aes(age, fct_reorder(rincome, age))) + geom_point()
+rincome %>% select(rincome, age) %>% arrange(age)
+
+ggplot(rincome, aes(age, fct_relevel(rincome, "Not applicable"))) + geom_point()
+fct_relevel(rincome$rincome, "Not applicable")
